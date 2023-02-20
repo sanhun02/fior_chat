@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Log in | {% endblock %}
+
+{% block nav_button %}
+<div>
+    <a href="/rooms/" class="focus:bg-gray-200 px-4 py-3 bg-white border border-black rounded-xl hover:bg-gray-200">Rooms</a>
+    <a href="/home/" class="ml-4 px-4 py-3 bg-violet-600 text-white rounded-xl hover:bg-violet-500">Home</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto mt-9 p-8 shadow-xl w-3/5 h-1/2 rounded-xl">
+    <h2 class="text-black text-3xl font-semibold">Enter room name</h2> 
+
+    <form action="." method="post">
+        {% csrf_token %}
+
+        <div class="mb-5 mt-8">
+            <label class="text-black">Room name</label>
+            <input type="text" name="room_name" placeholder="No spaces allowed" class="w-full mt-2 px-4 py-2 rounded border border-black outline-violet-600">
+        </div>
+
+        <div class="mb-5 mt-9">
+            <button class="py-3 px-4 w-full rounded-3xl bg-violet-600 hover:bg-violet-500 text-white">Submit</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

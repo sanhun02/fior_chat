@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ room.name }} | {% endblock %}
+
+{% block nav_button %} 
+<div>
+    <a href="/home/" class="px-4 py-3 bg-white font-medium border border-black rounded-xl hover:bg-gray-200">Home</a>
+    <a href="/logout/" class="ml-4 px-4 py-3 font-medium bg-violet-600 text-white rounded-xl hover:bg-violet-500">Log out</a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="p-2 flex-col mx-auto mt-4 shadow-xl w-3/4 h-[28rem] rounded-3xl mb-6">
+    <div class="px-4 flex justify-between items-center w-full border-b border-gray-200">
+        <p class="text-xl font-bold">{{ room.name }}</p>
+
+        <a href="/rooms/">
+            <button class="px-5 text-sm py-2 rounded-xl border border-black hover:bg-gray-200">
+                Leave
+            </button>
+        </a>
+    </div>
+    <div class="mt-2 flex-col overflow-y-auto space-y-3 w-full p-3 h-4/5" id="chat-msgs">
+        {% for msg in msgs %}
+            {% if user.username != msg.user.username %}
+                <div class="p-2 bg-gray-200 rounded-xl w-3/4 text-wrap overflow-x-auto">
+                    <p class="font-semibold">{{ msg.user.username }}</p>
+                    <p>{{ msg.content }}</p>
+                </div>
+            {% else %}
+                <div class="p-2 bg-violet-600 text-white rounded-xl w-3/4 ml-auto overflow-x-auto text-right">
+                    <p class="font-semibold">{{ msg.user.username }}</p>
+                    <p>{{ msg.content }}</p>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+        <form method="post" action="." class="mt-2 flex mx-auto mt-auto h-14 w-3/5 absolute">
+           {% csrf_token %}
+            <input type="text" id="msg-input" name="input" class="mr-3 outline-none w-5/6 whitespace-normal" placeholder="Type your message...">
+            
+            <button type="submit" class="px-5 text-sm py-2 rounded-xl text-white bg-violet-600 hover:bg-violet-500" id="msg-submit">
+                Send
+            </button>
+        </form>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+{{ room.slug|json_script:"json-roomname" }}
+{{ request.user.username|json_script:"json-username" }}
+
+    <script>
+        const room_name = JSON.parse(document.getElementById('json-roomname').textContent);
+        const user_name = JSON.parse(document.getElementById('json-username').textContent);
+
+        const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/' + room_name +'/')
+        
+        chatSocket.onopen = function (e) {
+            console.log("The connection was setup successfully!")
+        }
+
+        chatSocket.onclose = function (e) {
+            console.log("Something unexpected happened!")
+        }
+
+        document.querySelector('#msg-submit').onclick = function (e) {
+            e.preventDefault()
+
+            const msgInput = document.querySelector('#msg-input').value 
+            chatSocket.send(JSON.stringify({'msg' : msgInput, 'username' : user_name, 'room' : room_name}))
+            document.querySelector('#msg-input').value = ''
+            
+            return false
+        }
+
+        chatSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data)
+            if (data.msg && user_name == data.username) {
+                let html = '<div class="p-2 bg-violet-600 text-white rounded-xl w-3/4 ml-auto overflow-x-auto text-right">';
+                    html += '<p class="font-semibold">' + data.username + '</p>';
+                    html += '<p>' + data.msg + '</p></div>';
+
+                    document.querySelector('#chat-msgs').innerHTML += html;
+                    console.log()
+
+                    scrollToBottom();
+
+            } else if (data.msg && user_name != data.username) {
+                let html = '<div class="p-2 bg-gray-200 rounded-xl w-3/4 text-wrap overflow-x-auto">';
+                    html += '<p class="font-semibold">' + data.username + '</p>';
+                    html += '<p>' + data.msg + '</p></div>';
+
+                    document.querySelector('#chat-msgs').innerHTML += html;
+
+                    scrollToBottom();
+
+            } else {
+                alert('The message was empty')
+            }
+
+        }
+
+        function scrollToBottom() {
+            const objDiv = document.querySelector('#chat-msgs');
+            objDiv.scrollTop = objDiv.scrollHeight;
+        }
+
+        scrollToBottom()
+    </script>
+{% endblock %}

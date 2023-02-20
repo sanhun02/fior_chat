@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome | {% endblock %}
+
+{% block nav_button %} 
+<div>
+    <a href="/rooms/" class="focus:bg-gray-200 px-4 py-3 bg-white border border-black rounded-xl hover:bg-gray-200">Rooms</a>
+    <a href="/logout/" class="ml-4 px-4 py-3 bg-violet-600 text-white rounded-xl hover:bg-violet-500">Log out</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="flex mx-auto mt-4 shadow-xl w-3/4 h-[28rem] rounded-3xl mb-6">
+    <div class="border-r overflow-y-auto border-gray-200 h-[28rem] w-1/4 rounded-l-3xl p-1 text-center">
+        <div class="mt-2 text-black text-lg font-bold mx-auto">My Rooms</div>
+        <div class="mt-4">
+                {% for room in user_rooms %}
+                    {% for msg_tuple in msgs %}
+                        {% if msg_tuple.0 == room.slug %}
+                        <form action="." method="post">
+                            {% csrf_token %}
+                            <button type='submit' value="{{ room.slug }}" name="current-room" id='home-current-room' class="px-1.5 rounded-xl focus:bg-gray-100 w-full h-16 text-center overflow-hidden">
+                                <div class="text-base text-violet-600 font-medium">{{ room.name }}</div>
+                            </button>
+                        </form>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+        </div>
+    </div>
+
+    <div class="flex-col text-center items-center space-y-3 w-3/4 rounded-r-3xl p-3">
+            <p class="text-xl font-extrabold">{{ home_room.name }}</p>
+            <div class="h-4/5 overflow-y-auto" id="chat-msgs">
+                {% for msg in home_msgs %}
+                    {% if user.username != msg.user.username %}
+                        <div class="mt-2 p-2 bg-gray-200 rounded-xl w-3/4 text-left text-wrap overflow-x-auto">
+                            <p class="font-semibold">{{ msg.user.username }}</p>
+                            <p>{{ msg.content }}</p>
+                        </div>
+                    {% else %}
+                        <div class="mt-2 p-2 bg-violet-600 text-white rounded-xl w-3/4 ml-auto overflow-x-auto text-right">
+                            <p class="font-semibold">{{ msg.user.username }}</p>
+                            <p>{{ msg.content }}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <form method="post" action="." class="flex justify-center">
+                <input type="text" id="msg-input" name="content" class="mr-3 outline-none w-7/8 whitespace-normal" placeholder="Type your message..." id="chat-msg-input">
+                
+                <button type="submit" class="px-4 text-sm py-2 rounded-xl text-white bottom-0 bg-violet-600 hover:bg-violet-500" id="msg-submit">
+                    Send
+                </button>
+            </form>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+{{ home_room.slug|json_script:"json-roomname" }}
+{{ request.user.username|json_script:"json-username" }}
+
+    <script>
+        const room_name = JSON.parse(document.getElementById('json-roomname').textContent);
+        const user_name = JSON.parse(document.getElementById('json-username').textContent);
+
+        const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/' + room_name +'/')
+        
+        chatSocket.onopen = function (e) {
+            console.log("The connection was setup successfully!")
+        }
+
+        chatSocket.onclose = function (e) {
+            console.log("Something unexpected happened!")
+        }
+
+        document.querySelector('#msg-submit').onclick = function (e) {
+            e.preventDefault()
+
+            const msgInput = document.querySelector('#msg-input').value 
+            chatSocket.send(JSON.stringify({'msg' : msgInput, 'username' : user_name, 'room' : room_name}))
+            document.querySelector('#msg-input').value = ''
+            
+            return false
+        }
+
+        chatSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data)
+            if (data.msg && user_name == data.username) {
+                let html = '<div class="mt-2 p-2 bg-violet-600 text-white rounded-xl w-3/4 ml-auto overflow-x-auto text-right">';
+                    html += '<p class="font-semibold">' + data.username + '</p>';
+                    html += '<p>' + data.msg + '</p></div>';
+
+                    document.querySelector('#chat-msgs').innerHTML += html;
+                    
+                    scrollToBottom();
+
+            } else if (data.msg && user_name != data.username) {
+                let html = '<div class="mt-2 p-2 bg-gray-200 rounded-xl w-3/4 text-left text-wrap overflow-x-auto">';
+                    html += '<p class="font-semibold">' + data.username + '</p>';
+                    html += '<p>' + data.msg + '</p></div>';
+
+                    document.querySelector('#chat-msgs').innerHTML += html;
+
+                    scrollToBottom();
+
+            } else {
+                alert('The message was empty')
+            }
+
+        }
+
+        function scrollToBottom() {
+            const objDiv = document.querySelector('#chat-msgs');
+            objDiv.scrollTop = objDiv.scrollHeight;
+        }
+
+        scrollToBottom()
+    </script>
+{% endblock %}

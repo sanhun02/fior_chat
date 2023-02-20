@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign up | {% endblock %}
+
+{% block nav_button %}
+<div class="flex items-center space-x-4">
+    <a href="/" class="px-4 py-2 rounded-xl border border-black hover:bg-gray-200">Log in</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto mt-2 mb-8 p-8 shadow-xl w-3/5 h-[29rem] rounded-xl">
+    <h2 class="text-black text-3xl font-semibold">Sign up</h2> 
+
+    <form action="." method="post">
+        {% csrf_token %}
+
+        <div class="mb-5 mt-8">
+            <label class="text-black">Username</label>
+            <input type="text" name="username" class="w-full mt-2 px-4 py-2 rounded border border-black outline-violet-600">
+        </div>
+
+        <div class="mb-5 mt-4">
+            <label class="text-black">Password</label>
+            <input type="password" name="password1" class="w-full mt-2 px-4 py-2 rounded border-black border outline-violet-600">
+        </div>
+
+        <div class="mb-5 mt-4">
+            <label class="text-black">Repeat Password</label>
+            <input type="password" name="password2" class="w-full mt-2 px-4 py-2 rounded border-black border outline-violet-600">
+        </div>
+
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="mb-5 p-2 rounded-xl bg-red-300 text-black">
+                        <p>{{ error|escape }}</p>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        <div class="mb-5 mt-9">
+            <button class="py-3 px-4 w-full rounded-3xl bg-violet-600 hover:bg-violet-500 text-white">Sign up</button>
+        </div>
+
+        <p class="w-4/6 mx-auto mt-8">Already a user? <a href="/" class="text-violet-600 font-medium">Log in</a></p>
+    </form>
+</div>
+
+{% endblock %}
