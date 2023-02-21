@@ -2,6 +2,8 @@
 
 FiorChat is a real-time chat application using Django and Tailwind. It features being able to sign up & log out, joining chat rooms, creating a chat room, and a hub showing the messages of all the rooms a user joined.
 
+![](https://1drv.ms/u/s!At2iQ6BUyjYUgUoF4V2nmuXSeSVU?e=80GNZw)
+
 ## Setup
 
 First clone the repository:
