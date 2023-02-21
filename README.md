@@ -9,6 +9,7 @@ First clone the repository:
 ```bash
 $ git clone https://github.com/sanhun02/fior_chat.git
 $ cd fior_chat
+$ cd fior_project
 ```
 
 Install project dependencies:
