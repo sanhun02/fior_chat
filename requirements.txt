@@ -1,0 +1,2 @@
+channels==8.19.3
+Django==8.19.3

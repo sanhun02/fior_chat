@@ -9,10 +9,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="mx-auto mt-2 mb-8 p-8 shadow-xl w-3/5 h-[29rem] rounded-xl">
-    <h2 class="text-black text-3xl font-semibold">Sign up</h2> 
+<div class="text-center mx-auto mt-2 mb-8 p-8 shadow-xl w-3/5 h-[29rem] rounded-xl">
+    <h2 class="text-left text-black text-3xl font-semibold">Sign up</h2> 
 
-    <form action="." method="post">
+    <form action="." method="post" class="text-left">
         {% csrf_token %}
 
         <div class="mb-5 mt-8">
@@ -43,9 +43,9 @@
         <div class="mb-5 mt-9">
             <button class="py-3 px-4 w-full rounded-3xl bg-violet-600 hover:bg-violet-500 text-white">Sign up</button>
         </div>
-
-        <p class="w-4/6 mx-auto mt-8">Already a user? <a href="/" class="text-violet-600 font-medium">Log in</a></p>
     </form>
+
+    <p class="mt-8">Already a user? <a href="/" class="text-violet-600 font-medium">Log in</a></p>
 </div>
 
 {% endblock %}

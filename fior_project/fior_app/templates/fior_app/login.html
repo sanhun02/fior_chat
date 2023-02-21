@@ -3,10 +3,10 @@
 {% block title %}Log in | {% endblock %}
 
 {% block content %}
-<div class="mx-auto mt-4 p-8 shadow-xl w-3/5 h-96 rounded-xl">
-    <h2 class="text-black text-3xl font-semibold">Log in</h2> 
+<div class="text-center mx-auto mt-4 p-8 shadow-xl w-3/5 h-96 rounded-xl">
+    <h2 class="text-left text-black text-3xl font-semibold">Log in</h2> 
 
-    <form action="." method="post">
+    <form action="." method="post" class="text-left">
         {% csrf_token %}
 
         <div class="mb-5 mt-8">
@@ -34,7 +34,7 @@
         </div>
     </form>
 
-    <p class="w-3/4 mx-auto mt-12">New to FiorChat? <a href="/signup/" class="text-violet-600 font-medium">Join now</a></p>
+    <p class="mt-12">New to FiorChat? <a href="/signup/" class="text-violet-600 font-medium">Join now</a></p>
 </div>
 
 {% endblock %}
