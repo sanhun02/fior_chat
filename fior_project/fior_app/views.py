@@ -36,7 +36,7 @@ def home(request, *args, **kwargs):
             home_room = None
             home_msgs = None
 
-    return render(request, 'fior_app/home.html', {'user_rooms' : user_rooms, 'msgs' : msgs, 'home_room' : home_room, 'home_msgs' : home_msgs})
+    return render(request, 'fior_app/index.html', {'user_rooms' : user_rooms, 'msgs' : msgs, 'home_room' : home_room, 'home_msgs' : home_msgs})
 
 def signup(request):
     if request.method == 'POST':
